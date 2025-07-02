@@ -1,9 +1,10 @@
-from textnode import TextNode, TextType
+from htmlnode import HTMLNode
 
 
 def main():
-    dummy = TextNode("This is some anchor text", TextType.LINK, "https://www.boot.dev")
-    print(dummy)
+    dummy2 = HTMLNode("a", "this is a link.", None, {"href": "https://boot.dev", "target": "_blank"})
+    dummy3 = HTMLNode("p", "this is a paragraph.", [dummy2], None)
+    print(dummy3)
 
 
 main()
