@@ -1,6 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode
+from htmlnode import HTMLNode, LeafNode
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -26,6 +26,26 @@ class TestHTMLNode(unittest.TestCase):
         outer = HTMLNode("p", "i am a paragraph", [inner], None)
         self.assertEqual("HTMLNode(p, i am a paragraph, children: [HTMLNode(a, i am a link, children: None, {'href': 'https://boot.dev', 'target': '_blank'})], None)", repr(outer))
 
+
+class TestLeafNode(unittest.TestCase):
+    def test_leaf_to_html(self):
+        node = LeafNode("p", "Hello, world!")
+        expected = "<p>Hello, world!</p>"
+        self.assertEqual(node.to_html(), expected)
+
+    def test_leaf_to_html_tag_not_eq(self):
+        node = LeafNode("a", "Hello, world!")
+        node2 = LeafNode("p", "Hello, world!")
+        self.assertNotEqual(node.to_html(), node2.to_html())
+
+    def test_leaf_to_html_props(self):
+        node = LeafNode("a", "i am a link", {"href": "https://boot.dev", "target": "_blank"})
+        expected = '<a href="https://boot.dev" target="_blank">i am a link</a>'
+        self.assertEqual(node.to_html(), expected)
+
+    def test_leaf_to_html_no_tag(self):
+        node = LeafNode(None, "Hello, world!")
+        self.assertEqual(node.to_html(), "Hello, world!")
 
 if __name__ == "__main__":
     unittest.main()
