@@ -1,29 +1,43 @@
-class HTMLNode():
-    def __init__(self, tag=None, value=None, children=None, props=None):
-        self.tag = tag
-        self.value = value
-        self.children = children
-        self.props = props
+from __future__ import annotations
 
-    def to_html(self):
+
+class HTMLNode():
+    def __init__(
+        self,
+        tag:                 str | None = None,
+        value:               str | None = None,
+        children: list[HTMLNode] | None = None,
+        props:    dict[str, str | None] | None = None,
+    ) -> None:
+        self.tag      = tag
+        self.value    = value
+        self.children = children
+        self.props    = props
+
+    def to_html(self) -> str:
         raise NotImplementedError("Child class must override")
 
-    def props_to_html(self):
+    def props_to_html(self) -> str:
         prop_str = ''
         if self.props:
             for key in self.props:
                 prop_str += f' {key}="{self.props[key]}"'
         return prop_str
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"HTMLNode({self.tag}, {self.value}, children: {self.children}, {self.props})"
 
 
 class LeafNode(HTMLNode):
-    def __init__(self, tag, value, props=None):
+    def __init__(
+        self,
+        tag:   str | None,
+        value: str,
+        props: dict[str, str | None] | None = None
+    ) -> None:
         super().__init__(tag, value, None, props)
 
-    def to_html(self):
+    def to_html(self) -> str:
         if self.value is None:
             raise ValueError("All leaf nodes must have a value")
 
@@ -37,10 +51,15 @@ class LeafNode(HTMLNode):
 
 
 class ParentNode(HTMLNode):
-    def __init__(self, tag, children, props=None):
+    def __init__(
+        self,
+        tag:      str,
+        children: list[HTMLNode],
+        props:    dict[str, str | None] | None = None
+    ) -> None:
         super().__init__(tag, None, children, props)
 
-    def to_html(self):
+    def to_html(self) -> str:
         if self.tag is None:
             raise ValueError("All parent nodes must have a tag")
 
