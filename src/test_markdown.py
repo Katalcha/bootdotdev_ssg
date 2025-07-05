@@ -1,6 +1,6 @@
 import unittest
 
-from markdown import split_nodes_delimiter
+from markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 from textnode import TextNode, TextType
 
 
@@ -84,6 +84,15 @@ class TestInlineMarkdown(unittest.TestCase):
         node = TextNode("This is text with a `code block word", TextType.TEXT)
         with self.assertRaises(ValueError):
             split_nodes_delimiter([node], "`", TextType.CODE)
+
+    def test_extract_markdown_images(self) -> None:
+        extracted_markdown = extract_markdown_images("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)")
+        expected = [("image", "https://i.imgur.com/zjjcJKZ.png")]
+        self.assertListEqual(extracted_markdown, expected)
+
+    def test_extract_markdown_links(self) -> None:
+        extracted_markdown = extract_markdown_links("This is text with a [link](https://boot.dev) and [another link](https://www.freecodecamp.org)")
+        self.assertListEqual(extracted_markdown, [("link", "https://boot.dev"), ("another link", "https://www.freecodecamp.org")])
 
 
 if __name__ == "__main__":
