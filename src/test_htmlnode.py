@@ -6,97 +6,90 @@ from htmlnode import HTMLNode, LeafNode, ParentNode
 class TestHTMLNode(unittest.TestCase):
     def test_props_to_html_result_eq(self) -> None:
         node = HTMLNode("a", "i am a link", None, {"href": "https://boot.dev", "target": "_blank"})
-        self.assertEqual(node.props_to_html(), ' href="https://boot.dev" target="_blank"')
+        actual, expected = node.props_to_html(), ' href="https://boot.dev" target="_blank"'
+        self.assertEqual(actual, expected)
 
     def test_props_to_html_eq(self) -> None:
-        node = HTMLNode("p", "hello world", None, None)
-        node2 = HTMLNode("p", "hello world", None, None)
-        self.assertEqual(node.props_to_html(), node2.props_to_html())
+        node, node2 = HTMLNode("p", "hello world", None, None), HTMLNode("p", "hello world", None, None)
+        actual, expected = node.props_to_html(), node2.props_to_html()
+        self.assertEqual(actual, expected)
 
     def test_values(self) -> None:
         link = HTMLNode("a", "link", None, {"href": "https://boot.dev"})
         node = HTMLNode("div", "I wish I could read", [link], {"class": "container"})
-        self.assertEqual(node.tag, "div")
-        self.assertEqual(node.value, "I wish I could read")
-        self.assertEqual(node.children, [link])
-        self.assertEqual(node.props, {"class": "container"})
+        actual, expected = [node.tag, node.value, node.children, node.props], ["div", "I wish I could read", [link], {"class": "container"}]
+        self.assertListEqual(actual, expected)
 
     def test_repr(self) -> None:
         inner = HTMLNode("a", "i am a link", None, {"href": "https://boot.dev", "target": "_blank"})
         outer = HTMLNode("p", "i am a paragraph", [inner], None)
-        self.assertEqual("HTMLNode(p, i am a paragraph, children: [HTMLNode(a, i am a link, children: None, {'href': 'https://boot.dev', 'target': '_blank'})], None)", repr(outer))
+        actual, expected = repr(outer), "HTMLNode(p, i am a paragraph, children: [HTMLNode(a, i am a link, children: None, {'href': 'https://boot.dev', 'target': '_blank'})], None)"
+        self.assertEqual(actual, expected)
 
     def test_to_html_not_implemented_error(self) -> None:
-        node = HTMLNode("a", "i am a link", None, {"href": "https://boot.dev", "target": "_blank"})
         with self.assertRaises(NotImplementedError):
-            node.to_html()
+            HTMLNode("a", "i am a link", None, {"href": "https://boot.dev", "target": "_blank"}).to_html()
 
 class TestLeafNode(unittest.TestCase):
     def test_leaf_to_html(self) -> None:
         node = LeafNode("p", "Hello, world!")
-        expected = "<p>Hello, world!</p>"
-        self.assertEqual(node.to_html(), expected)
+        actual, expected = node.to_html(), "<p>Hello, world!</p>"
+        self.assertEqual(actual, expected)
 
     def test_leaf_to_html_tag_not_eq(self) -> None:
-        node = LeafNode("a", "Hello, world!")
-        node2 = LeafNode("p", "Hello, world!")
-        self.assertNotEqual(node.to_html(), node2.to_html())
+        node, node2 = LeafNode("a", "Hello, world!"), LeafNode("p", "Hello, world!")
+        actual, expected = node.to_html(), node2.to_html()
+        self.assertNotEqual(actual, expected)
 
     def test_leaf_to_html_props(self) -> None:
         node = LeafNode("a", "i am a link", {"href": "https://boot.dev", "target": "_blank"})
-        expected = '<a href="https://boot.dev" target="_blank">i am a link</a>'
-        self.assertEqual(node.to_html(), expected)
+        actual, expected = node.to_html(), '<a href="https://boot.dev" target="_blank">i am a link</a>'
+        self.assertEqual(actual, expected)
 
     def test_leaf_to_html_no_tag(self) -> None:
         node = LeafNode(None, "Hello, world!")
-        self.assertEqual(node.to_html(), "Hello, world!")
+        actual, expected = node.to_html(), "Hello, world!"
+        self.assertEqual(actual, expected)
 
     def test_leaf_to_html_value_error(self) -> None:
-        node = LeafNode("p", None) # type: ignore[reportArgumentType]
         with self.assertRaises(ValueError):
-            node.to_html()
+            LeafNode("p", None).to_html() # type: ignore[reportArgumentType]
 
 class TestParentNode(unittest.TestCase):
     def test_to_html_with_children(self) -> None:
-            child_node = LeafNode("span", "child")
-            parent_node = ParentNode("div", [child_node])
-            self.assertEqual(parent_node.to_html(), "<div><span>child</span></div>")
+        child_node = LeafNode("span", "child")
+        parent_node = ParentNode("div", [child_node])
+        actual, expected = parent_node.to_html(), "<div><span>child</span></div>"
+        self.assertEqual(actual, expected)
 
     def test_to_html_with_grandchildren(self) -> None:
         grandchild_node = LeafNode("b", "grandchild")
         child_node = ParentNode("span", [grandchild_node])
         parent_node = ParentNode("div", [child_node])
-        self.assertEqual(parent_node.to_html(), "<div><span><b>grandchild</b></span></div>")
+        actual, expected = parent_node.to_html(), "<div><span><b>grandchild</b></span></div>"
+        self.assertEqual(actual, expected)
 
     def test_to_html_many_children(self) -> None:
-        a = LeafNode("b", "Bold text")
-        b = LeafNode(None, "Normal text")
-        c = LeafNode("i", "italic text")
-        d = LeafNode(None, "Normal text")
+        a, b, c, d = LeafNode("b", "Bold text"), LeafNode(None, "Normal text"), LeafNode("i", "italic text"), LeafNode(None, "Normal text")
         node = ParentNode("p", [a, b, c, d])
-        self.assertEqual(node.to_html(), "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>")
+        actual, expected = node.to_html(), "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>"
+        self.assertEqual(actual, expected)
 
     def test_headings(self) -> None:
-        a = LeafNode("b", "Bold text")
-        b = LeafNode(None, "Normal text")
-        c = LeafNode("i", "italic text")
-        d = LeafNode(None, "Normal text")
+        a, b, c, d = LeafNode("b", "Bold text"), LeafNode(None, "Normal text"), LeafNode("i", "italic text"), LeafNode(None, "Normal text")
         node = ParentNode("h2", [a, b, c, d])
-        self.assertEqual(node.to_html(), "<h2><b>Bold text</b>Normal text<i>italic text</i>Normal text</h2>")
+        actual, expected = node.to_html(), "<h2><b>Bold text</b>Normal text<i>italic text</i>Normal text</h2>"
+        self.assertEqual(actual, expected)
 
     def test_to_html_tag_value_error(self) -> None:
-        a = LeafNode("b", "Bold text")
-        b = LeafNode(None, "Normal text")
-        c = LeafNode("i", "italic text")
-        d = LeafNode(None, "Normal text")
-        node = ParentNode(None, [a, b, c, d]) # type: ignore[reportArgumentType]
+        a, b, c, d = LeafNode("b", "Bold text"), LeafNode(None, "Normal text"), LeafNode("i", "italic text"), LeafNode(None, "Normal text")
         with self.assertRaises(ValueError):
-            node.to_html()
+            ParentNode(None, [a, b, c, d]).to_html() # type: ignore[reportArgumentType]
 
     def test_to_html_children_value_error(self) -> None:
-        node = ParentNode("h2", None) # type: ignore[reportArgumentType]
         with self.assertRaises(ValueError):
-            node.to_html()
+            ParentNode("h2", None).to_html() # type: ignore[reportArgumentType]
+
 
 if __name__ == "__main__":
     unittest.main()
